@@ -1274,6 +1274,7 @@
 		<copy todir="${test_classes}">
 			<fileset dir="${test}">
 				<include name="**/*.xml" />
+				<include name="**/*.json" />
 			</fileset>
 		</copy>
 		
