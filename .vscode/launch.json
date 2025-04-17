@@ -1,0 +1,199 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "type": "java",
+      "name": "Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    },
+    {
+      "type": "java",
+      "name": "FilterDialog",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.client.ui.FilterDialog",
+      "projectName": "Client"
+    },
+    {
+      "type": "java",
+      "name": "Mirth",
+      "request": "launch",
+      "cwd":"${workspaceFolder}/client",
+      "mainClass": "com.mirth.connect.client.ui.Mirth",
+      "projectName": "Client"
+    },
+    {
+      "type": "java",
+      "name": "RefreshTableModel",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.client.ui.RefreshTableModel",
+      "projectName": "Client"
+    },
+    {
+      "type": "java",
+      "name": "SQLParserUtil",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.client.ui.util.SQLParserUtil",
+      "projectName": "Client"
+    },
+    {
+      "type": "java",
+      "name": "CommandLineInterface",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.cli.CommandLineInterface",
+      "projectName": "Command"
+    },
+    {
+      "type": "java",
+      "name": "CommandLineLauncher",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.cli.launcher.CommandLineLauncher",
+      "projectName": "Command"
+    },
+    {
+      "type": "java",
+      "name": "HL7ModelGenerator",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.model.generator.HL7ModelGenerator",
+      "projectName": "Generator"
+    },
+    {
+      "type": "java",
+      "name": "Manager",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.manager.Manager",
+      "projectName": "Manager"
+    },
+    {
+      "type": "java",
+      "name": "DigestUtil",
+      "request": "launch",
+      "mainClass": "com.mirth.commons.encryption.util.DigestUtil",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "EncryptionUtil",
+      "request": "launch",
+      "mainClass": "com.mirth.commons.encryption.util.EncryptionUtil",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "Stopwatch",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.model.converters.Stopwatch",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "DICOMTests",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.plugins.datatypes.dicom.DICOMTests",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "X12Tests",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.plugins.datatypes.edi.X12Tests",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "X12Tests2",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.plugins.datatypes.edi.X12Tests2",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "HL7Tests",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.plugins.datatypes.hl7v2.HL7Tests",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "NCPDPTests",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.plugins.datatypes.ncpdp.NCPDPTests",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "Mirth(1)",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/server",
+      "mainClass": "com.mirth.connect.server.Mirth",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "MirthLauncher",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.server.launcher.MirthLauncher",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "ScriptRunner",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.server.tools.ScriptRunner",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "DcmRcv",
+      "request": "launch",
+      "mainClass": "org.dcm4che2.tool.dcmrcv.DcmRcv",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "DcmSnd",
+      "request": "launch",
+      "mainClass": "org.dcm4che2.tool.dcmsnd.DcmSnd",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "org.mozilla.javascript.tools.debugger.Main",
+      "projectName": "Server"
+    },
+    {
+      "type": "java",
+      "name": "SimpleReceiver",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.simplereceiver.SimpleReceiver",
+      "projectName": "SimpleSender"
+    },
+    {
+      "type": "java",
+      "name": "SimpleSender",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.simplesender.SimpleSender",
+      "projectName": "SimpleSender"
+    },
+    {
+      "type": "java",
+      "name": "SimpleSenderServer",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.simplesender.SimpleSenderServer",
+      "projectName": "SimpleSender"
+    },
+    {
+      "type": "java",
+      "name": "SimpleSenderServerTest",
+      "request": "launch",
+      "mainClass": "com.mirth.connect.simplesender.SimpleSenderServerTest",
+      "projectName": "SimpleSender"
+    }
+  ]
+}
