@@ -19,8 +19,8 @@ import java.nio.charset.Charset;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,10 +28,10 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.filter.Filterable;
 import org.apache.velocity.runtime.RuntimeConstants;
@@ -45,6 +45,7 @@ import com.mirth.connect.model.LibraryProperties;
 import com.mirth.connect.model.ResourceProperties;
 import com.mirth.connect.model.ResourcePropertiesList;
 import com.mirth.connect.model.ServerEvent;
+import com.mirth.connect.model.ServerSettings;
 import com.mirth.connect.model.UpdateSettings;
 import com.mirth.connect.model.converters.ObjectXMLSerializer;
 import com.mirth.connect.model.util.MigrationException;
@@ -344,9 +345,11 @@ public class Mirth extends Thread {
             ((org.apache.logging.log4j.core.Logger) velocityLogger).setLevel(Level.OFF);
         }
 
+        updateServerSettingsFromEnvironment();
+
         eventController.dispatchEvent(new ServerEvent(configurationController.getServerId(), "Server startup"));
 
-        // Start web server before starting the engine in case there is a 
+        // Start web server before starting the engine in case there is a
         // problem starting the engine that causes it to hang
         startWebServer();
 
@@ -402,6 +405,39 @@ public class Mirth extends Thread {
         // schedule usage statistics to be sent at startup and every 24 hours
         Timer timer = new Timer();
         timer.schedule(new UsageSenderTask(), 0, ConnectServiceUtil.MILLIS_PER_DAY);
+    }
+
+    private void updateServerSettingsFromEnvironment() {
+        Optional<String> newServerName = getEnvironmentVariable("MC_SERVER_NAME");
+        Optional<String> newEnvName = getEnvironmentVariable("MC_ENV_NAME");
+
+        if (newServerName.isPresent() || newEnvName.isPresent()) {
+            try {
+                ServerSettings serverSettings = configurationController.getServerSettings();
+
+                if (newServerName.isPresent()) {
+                    serverSettings.setServerName(newServerName.get());
+                }
+                if (newEnvName.isPresent()) {
+                    serverSettings.setEnvironmentName(newEnvName.get());
+                }
+
+                configurationController.setServerSettings(serverSettings);
+            } catch (ControllerException e) {
+                logger.error("Failed to update server settings via environment variables", e);
+            }
+        }
+    }
+
+    /**
+     * Pull an environment variable. Values are trimmed, and only non-empty values are returned.
+     * 
+     * @param envName the environment variable name
+     * @return the property's value
+     */
+    private Optional<String> getEnvironmentVariable(String envName) {
+        String propValue = StringUtils.trimToEmpty(System.getenv(envName));
+        return StringUtils.isNotBlank(propValue) ? Optional.of(propValue) : Optional.empty();
     }
 
     /**
