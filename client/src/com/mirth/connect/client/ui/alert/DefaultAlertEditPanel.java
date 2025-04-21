@@ -18,8 +18,6 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,6 +32,8 @@ import com.mirth.connect.model.alert.AlertModel;
 import com.mirth.connect.model.alert.AlertTrigger;
 import com.mirth.connect.model.alert.ChannelTrigger;
 import com.mirth.connect.model.alert.DefaultTrigger;
+
+import net.miginfocom.swing.MigLayout;
 
 public class DefaultAlertEditPanel extends AlertEditPanel {
 
@@ -105,6 +105,8 @@ public class DefaultAlertEditPanel extends AlertEditPanel {
         variables.add("alertId");
         variables.add("alertName");
         variables.add("serverId");
+        variables.add("serverName");
+        variables.add("environmentName");
         variables.add("globalMapVariable");
         variables.add("date");
 
