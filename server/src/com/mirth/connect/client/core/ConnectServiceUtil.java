@@ -25,6 +25,9 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+
+import org.apache.http.client.methods.HttpGet;
+
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.HttpClientUtils;
@@ -38,6 +41,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -88,6 +92,73 @@ public class ConnectServiceUtil {
     }
 
     public static List<Notification> getNotifications(String serverId, String mirthVersion, Map<String, String> extensionVersions, String[] protocols, String[] cipherSuites) throws Exception {
+        List<Notification> allNotifications = new ArrayList<Notification>();
+
+        System.out.println("Entered getNotifications");
+
+        // make an api call
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+
+        HttpGet get = new HttpGet("https://api.github.com/repos/nextgenhealthcare/connect/releases");
+        // HttpGet get = new HttpGet();
+        // get.setURI(URI.create("josephlpaul.com"));
+        
+        // HttpClientContext getContext = HttpClientContext.create();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            response = client.execute(get);
+            System.out.println(response.getStatusLine());
+            HttpEntity entity1 = response.getEntity();
+            // BufferedReader br = new BufferedReader(new InputStreamReader(entity1.getContent()));
+            String responseContent = IOUtils.toString(entity1.getContent(), "utf8");
+ 
+            // System.out.println(responseContent);           
+
+            JsonNode rootNode = mapper.readTree(responseContent);
+
+            int i = 1;
+            for (JsonNode childNode : rootNode) {
+                System.out.println(i++);
+                // System.out.println(childNode.asText());
+
+                Notification notification = new Notification();
+             
+                notification.setId(childNode.get("id").asInt());
+                notification.setName(childNode.get("name").asText());
+                notification.setDate(childNode.get("published_at").asText());
+                notification.setContent(childNode.get("body").asText());
+                allNotifications.add(notification);
+            }
+
+            // do something useful with the response body
+            // and ensure it is fully consumed
+            EntityUtils.consume(entity1);
+
+
+        } catch (Exception e) {
+            System.out.print(e);
+            e.printStackTrace();
+            throw e;
+        } finally {
+            HttpClientUtils.closeQuietly(client);
+            HttpClientUtils.closeQuietly(response);
+        }
+
+
+        // try returning some hardcoded notifications
+
+        return allNotifications;
+    }
+
+    public static List<Notification> getNotifications2(String serverId, String mirthVersion, Map<String, String> extensionVersions, String[] protocols, String[] cipherSuites) throws Exception {
+
+        System.out.println("Entered getNotifications2");
+
+
         CloseableHttpClient client = null;
         HttpPost post = new HttpPost();
         CloseableHttpResponse response = null;
