@@ -122,7 +122,7 @@ public class ConnectServiceUtil {
 
             int i = 1;
             for (JsonNode childNode : rootNode) {
-                System.out.println(i++);
+                // System.out.println(i++);
                 // System.out.println(childNode.asText());
 
                 Notification notification = new Notification();
@@ -130,7 +130,11 @@ public class ConnectServiceUtil {
                 notification.setId(childNode.get("id").asInt());
                 notification.setName(childNode.get("name").asText());
                 notification.setDate(childNode.get("published_at").asText());
-                notification.setContent(childNode.get("body").asText());
+
+                // create the content html
+                String content = createNotificationHtml(childNode.get("name").asText(), childNode.get("html_url").asText());
+                notification.setContent(content);
+
                 allNotifications.add(notification);
             }
 
@@ -148,10 +152,40 @@ public class ConnectServiceUtil {
             HttpClientUtils.closeQuietly(response);
         }
 
+        // Notification notification = new Notification();
 
+        // notification.setId(1);
+        // notification.setName("4.5.3");
+        // notification.setDate("4/24/25");
+        // notification.setContent("<p>Tagged <a class=\"commit-link\" data-hovercard-type=\"commit\" data-hovercard-url=\"https://github.com/OpenIntegrationEngine/engine/commit/6ce3a9f0e3d84841f0b1e07c2808cf0bdb3d0a78/hovercard\" href=\"https://github.com/OpenIntegrationEngine/engine/commit/6ce3a9f0e3d84841f0b1e07c2808cf0bdb3d0a78\"><tt>6ce3a9f</tt></a></p>");
+
+        // allNotifications.add(notification);
         // try returning some hardcoded notifications
 
         return allNotifications;
+    }
+
+    private static String createNotificationHtml (String name, String releaseUrl) {
+        System.out.println("Entered createNotificationHtml");
+
+        StringBuilder content = new StringBuilder();
+
+        // create header with name
+        content.append("<h3>");
+        content.append(name);
+        content.append("</h3>");
+
+        // announce there is a new version with a p element
+        content.append("<p>");
+        content.append("A new version of Mirth Connect is available!");
+        content.append("</p");
+
+        // create a link to the release webpage
+        content.append("<a href=\"" + releaseUrl + "\">");
+        content.append("Release Webpage");
+        content.append("</a>");
+
+        return content.toString();
     }
 
     public static List<Notification> getNotifications2(String serverId, String mirthVersion, Map<String, String> extensionVersions, String[] protocols, String[] cipherSuites) throws Exception {
