@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -98,32 +99,37 @@ public class ConnectServiceUtil {
 
         // make an api call
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        // CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpClient client = null;
         CloseableHttpResponse response = null;
 
         HttpGet get = new HttpGet("https://api.github.com/repos/nextgenhealthcare/connect/releases");
-        // HttpGet get = new HttpGet();
-        // get.setURI(URI.create("josephlpaul.com"));
         
-        // HttpClientContext getContext = HttpClientContext.create();
-
         try {
             ObjectMapper mapper = new ObjectMapper();
 
+            client = getClient(protocols, cipherSuites);
             response = client.execute(get);
             System.out.println(response.getStatusLine());
             HttpEntity entity1 = response.getEntity();
-            // BufferedReader br = new BufferedReader(new InputStreamReader(entity1.getContent()));
             String responseContent = IOUtils.toString(entity1.getContent(), "utf8");
  
-            // System.out.println(responseContent);           
 
             JsonNode rootNode = mapper.readTree(responseContent);
 
-            int i = 1;
+            String[] mirthVersionStringArr = mirthVersion.split("[\\.]");
+            int[] mirthVersionIntArr = new int[mirthVersionStringArr.length];
+            for (int i = 0; i < mirthVersionStringArr.length; i++) {
+                mirthVersionIntArr[i] = Integer.parseInt(mirthVersionStringArr[i]);
+            }
+
+
+            
+
             for (JsonNode childNode : rootNode) {
-                // System.out.println(i++);
-                // System.out.println(childNode.asText());
+
+                
+                if (!checkNotificationVersion(mirthVersionIntArr, childNode.get("tag_name").asText())) break;
 
                 Notification notification = new Notification();
              
@@ -138,7 +144,6 @@ public class ConnectServiceUtil {
                 allNotifications.add(notification);
             }
 
-            // do something useful with the response body
             // and ensure it is fully consumed
             EntityUtils.consume(entity1);
 
@@ -152,40 +157,63 @@ public class ConnectServiceUtil {
             HttpClientUtils.closeQuietly(response);
         }
 
-        // Notification notification = new Notification();
-
-        // notification.setId(1);
-        // notification.setName("4.5.3");
-        // notification.setDate("4/24/25");
-        // notification.setContent("<p>Tagged <a class=\"commit-link\" data-hovercard-type=\"commit\" data-hovercard-url=\"https://github.com/OpenIntegrationEngine/engine/commit/6ce3a9f0e3d84841f0b1e07c2808cf0bdb3d0a78/hovercard\" href=\"https://github.com/OpenIntegrationEngine/engine/commit/6ce3a9f0e3d84841f0b1e07c2808cf0bdb3d0a78\"><tt>6ce3a9f</tt></a></p>");
-
-        // allNotifications.add(notification);
-        // try returning some hardcoded notifications
-
         return allNotifications;
     }
 
     private static String createNotificationHtml (String name, String releaseUrl) {
-        System.out.println("Entered createNotificationHtml");
+        // System.out.println("Entered createNotificationHtml");
+
+        // should arguments be sanitized?
+        // apache string escape utils??
+
+        String escapedName = StringEscapeUtils.escapeHtml4(name);
+        String escapedReleaseUrl = StringEscapeUtils.escapeHtml4(releaseUrl);
 
         StringBuilder content = new StringBuilder();
 
         // create header with name
-        content.append("<h3>");
-        content.append(name);
-        content.append("</h3>");
+        content.append("<h2>");
+        content.append(escapedName);
+        content.append("</h2>");
 
         // announce there is a new version with a p element
-        content.append("<p>");
+        content.append("<h3>");
         content.append("A new version of Mirth Connect is available!");
-        content.append("</p");
+        content.append("</h3>");
 
         // create a link to the release webpage
-        content.append("<a href=\"" + releaseUrl + "\">");
+        content.append("<a href=\"" + escapedReleaseUrl + "\">");
         content.append("Release Webpage");
         content.append("</a>");
 
         return content.toString();
+    }
+
+    private static boolean checkNotificationVersion (int[] mirthVersionArr, String notificationVersion) {
+        // checks release notifications to see whether they are unnecessary because user has already fully updated
+
+
+        String[] notificationVersionStringArr = notificationVersion.split("[\\.]");
+        int[] notificationVersionIntArr = new int[notificationVersionStringArr.length];
+
+
+        for (int i = 0; i < notificationVersionStringArr.length; i += 1) {
+            notificationVersionIntArr[i] = Integer.parseInt(notificationVersionStringArr[i]);
+        }
+
+        int lengthOfShorter = Math.min(mirthVersionArr.length, notificationVersionIntArr.length);
+
+        for (int i = 0; i < lengthOfShorter; i++) {
+            if (mirthVersionArr[i] > notificationVersionIntArr[i]) return false;
+        }
+
+        // if the user's mirth version is a subpatch of the patch this notification is for, return false
+        if (mirthVersionArr.length > notificationVersionIntArr.length) return false;
+
+        // if the user is using the version that this notification is for, return false
+        if (mirthVersionArr[mirthVersionArr.length - 1] == notificationVersionIntArr[notificationVersionIntArr.length - 1]) return false;
+        
+        return true;   
     }
 
     public static List<Notification> getNotifications2(String serverId, String mirthVersion, Map<String, String> extensionVersions, String[] protocols, String[] cipherSuites) throws Exception {
