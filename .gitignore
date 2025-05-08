@@ -1,6 +1,10 @@
 
 # /
 
+appdata/*
+derby.log
+logs/*
+
 .idea
 **/*.iml
 donkey/donkey-src
