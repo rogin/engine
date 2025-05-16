@@ -17,11 +17,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import java.util.function.Predicate;
+import java.util.Iterator;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
@@ -125,7 +128,7 @@ public class ConnectServiceUtil {
             if (statusCode == HttpStatus.SC_OK) {
                 responseEntity = httpResponse.getEntity();
 
-                var newerOnly = filterForNewerVersions(toJsonStream(responseEntity), mirthVersion);
+                Stream<JsonNode> newerOnly = filterForNewerVersions(toJsonStream(responseEntity), mirthVersion);
                 validNotifications = newerOnly.map(node -> toNotification(node)).collect(Collectors.toList());
             } else {
                 throw new ClientException("Status code: " + statusCode);
@@ -157,7 +160,32 @@ public class ConnectServiceUtil {
      */
     protected static Stream<JsonNode> filterForNewerVersions(Stream<JsonNode> nodes, String currentVersion) {
         int[] curVersion = toVersionArray(currentVersion);
-        return nodes.takeWhile(node -> isCurrentOlderThan(curVersion, node.get("tag_name").asText()));
+
+        //TODO This should just use takeWhile once we update to Java 8
+        //return nodes.takeWhile(node -> isCurrentOlderThan(curVersion, node.get("tag_name").asText()));
+        return takeWhile(nodes, node -> isCurrentOlderThan(curVersion, node.get("tag_name").asText()));
+    }
+
+    /**
+     * @deprecated This should just use Stream.takeWhile once we update to Java 8
+     * @param stream
+     * @param predicate
+     * @return
+     * @param <T>
+     */
+    private static <T> Stream<T> takeWhile(Stream<T> stream, Predicate<? super T> predicate) {
+        List<T> result = new ArrayList<>();
+        Iterator<T> iterator = stream.iterator();
+
+        while (iterator.hasNext()) {
+            T element = iterator.next();
+            if (!predicate.test(element)) {
+                break;
+            }
+            result.add(element);
+        }
+
+        return result.stream();
     }
 
     /**
