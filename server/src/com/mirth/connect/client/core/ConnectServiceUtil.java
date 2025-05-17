@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -52,6 +53,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.zafarkhaja.semver.Version;
 import com.mirth.connect.model.User;
 import com.mirth.connect.model.converters.ObjectXMLSerializer;
 import com.mirth.connect.model.notification.Notification;
@@ -111,6 +113,10 @@ public class ConnectServiceUtil {
     public static List<Notification> getNotifications(String serverId, String mirthVersion, Map<String, String> extensionVersions, String[] protocols, String[] cipherSuites) throws Exception {
         List<Notification> validNotifications = Collections.emptyList();
 
+        Optional<Version> parsedMirthVersion = Version.tryParse(mirthVersion);
+
+        if(!parsedMirthVersion.isPresent()) return validNotifications;
+
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse httpResponse = null;
         HttpEntity responseEntity = null;
@@ -125,7 +131,7 @@ public class ConnectServiceUtil {
             if (statusCode == HttpStatus.SC_OK) {
                 responseEntity = httpResponse.getEntity();
 
-                var newerOnly = filterForNewerVersions(toJsonStream(responseEntity), mirthVersion);
+                Stream<JsonNode> newerOnly = filterForNewerVersions(toJsonStream(responseEntity), parsedMirthVersion.get());
                 validNotifications = newerOnly.map(node -> toNotification(node)).collect(Collectors.toList());
             } else {
                 throw new ClientException("Status code: " + statusCode);
@@ -155,9 +161,8 @@ public class ConnectServiceUtil {
      * @param currentVersion
      * @return a non-null List
      */
-    protected static Stream<JsonNode> filterForNewerVersions(Stream<JsonNode> nodes, String currentVersion) {
-        int[] curVersion = toVersionArray(currentVersion);
-        return nodes.takeWhile(node -> isCurrentOlderThan(curVersion, node.get("tag_name").asText()));
+    protected static Stream<JsonNode> filterForNewerVersions(Stream<JsonNode> nodes, Version currentVersion) {
+        return nodes.filter(node -> isCurrentOlderThan(currentVersion, node.get("tag_name").asText()));
     }
 
     /**
@@ -214,14 +219,17 @@ public class ConnectServiceUtil {
     }
 
     /**
-     * Compare the current version with another. If current is greater than or equal, this returns false.
+     * Compare the current version with another. If current is less than other, return true. All others,
+     * including a malformed other, returns false.
      * 
      * @param currentVersion
      * @param anotherVersion
      * @return true if the current version is less than than the other
      */
-    protected static boolean isCurrentOlderThan (int[] currentVersion, String anotherVersion) {
-        return Arrays.compare(currentVersion, toVersionArray(anotherVersion)) < 0;
+    protected static boolean isCurrentOlderThan (Version currentVersion, String anotherVersion) {
+        Optional<Version> parsedOther = Version.tryParse(anotherVersion);
+        
+        return parsedOther.isPresent() && currentVersion.isLowerThan(parsedOther.get());
     }
 
     /**
