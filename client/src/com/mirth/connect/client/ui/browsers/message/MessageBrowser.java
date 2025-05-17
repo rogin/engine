@@ -382,6 +382,9 @@ public class MessageBrowser extends javax.swing.JPanel {
         MessageBrowserTableColumnFactory columnFactory = (MessageBrowserTableColumnFactory) messageTreeTable.getColumnFactory();
         for (int modelIndex = 0; modelIndex < columnList.size(); modelIndex++) {
             TableColumnExt column = columnFactory.createAndConfigureTableColumn(messageTreeTable.getModel(), modelIndex);
+            if (modelIndex >= columnMap.size()) {
+                columnFactory.configureCustomColumn(column, metaDataColumns.get(modelIndex - columnMap.size()).getType());
+            }
             messageTreeTable.addColumn(column);
         }
 
