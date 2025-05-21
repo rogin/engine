@@ -9,7 +9,6 @@
 
 package com.mirth.connect.client.ui;
 
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
@@ -17,9 +16,7 @@ import java.awt.event.WindowEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.JDialog;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -177,19 +174,9 @@ public class FirstLoginDialog extends javax.swing.JDialog implements UserDialogI
         
         contentTextPane.setParagraphAttributes(set, true);
         contentTextPane.setEditable(false);
-        contentTextPane.addHyperlinkListener(new HyperlinkListener() {
-            public void hyperlinkUpdate(HyperlinkEvent evt) {
-                if (evt.getEventType() == EventType.ACTIVATED && Desktop.isDesktopSupported()) {
-                    try {
-                        if (Desktop.isDesktopSupported()) {
-                            Desktop.getDesktop().browse(evt.getURL().toURI());
-                        } else {
-                            BareBonesBrowserLaunch.openURL(evt.getURL().toString());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+        contentTextPane.addHyperlinkListener(event -> {
+            if (event.getEventType() == EventType.ACTIVATED) {
+                BareBonesBrowserLaunch.openURL(event.getURL().toString());
             }
         });
 
