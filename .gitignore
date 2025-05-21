@@ -678,26 +678,6 @@ donkey/donkey-test
 
 # /server/src/org/mozilla/javascript/xmlimpl/
 
-# /simplesender/
-/simplesender/.settings
-/simplesender/bin
-
-# /simplesender/lib/
-
-# /simplesender/samples/
-
-# /simplesender/src/
-
-# /simplesender/src/com/
-
-# /simplesender/src/com/mirth/
-
-# /simplesender/src/com/mirth/connect/
-
-# /simplesender/src/com/mirth/connect/simplereceiver/
-
-# /simplesender/src/com/mirth/connect/simplesender/
-
 # /webadmin/
 /webadmin/build
 /webadmin/dist
