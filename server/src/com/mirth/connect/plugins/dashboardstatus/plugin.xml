@@ -3,8 +3,8 @@
 	<author>NextGen Healthcare</author>
 	<pluginVersion>@mirthversion</pluginVersion>
 	<mirthVersion>4.5.2</mirthVersion>
-	<url>http://www.nextgen.com</url>
-	<description>This plugin provides a real-time connection status column on the Mirth Connect client</description>
+	<url>https://openintegrationengine.org</url>
+	<description>This plugin provides a real-time connection status column on the Open Integration Engine client</description>
 	<serverClasses>
 		<string>com.mirth.connect.plugins.dashboardstatus.DashboardConnectorStatusMonitor</string>
 	</serverClasses>

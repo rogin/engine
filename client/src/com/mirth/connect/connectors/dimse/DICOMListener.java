@@ -427,7 +427,7 @@ public class DICOMListener extends ConnectorSettingsPanel {
             }
         });
 
-        jLabel30.setText("Store Recieved Objects in Directory:");
+        jLabel30.setText("Store Received Objects in Directory:");
 
         destField.setToolTipText("Store received objects into files in specified directory <dir>. Do not store received objects by default.");
 

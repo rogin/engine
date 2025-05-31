@@ -3,8 +3,8 @@
 	<author>NextGen Healthcare</author>
 	<pluginVersion>@mirthversion</pluginVersion>
 	<mirthVersion>4.5.2</mirthVersion>
-	<url>http://www.nextgen.com</url>
-	<description>This plugin provides a Rule Builder type for Mirth Connect filters</description>
+	<url>https://openintegrationengine.org</url>
+	<description>This plugin provides a Rule Builder type for Open Integration Engine filters</description>
 	<clientClasses>
 		<string>com.mirth.connect.plugins.rulebuilder.RuleBuilderPlugin</string>
 	</clientClasses>

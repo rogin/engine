@@ -3,8 +3,8 @@
 	<author>NextGen Healthcare</author>
 	<pluginVersion>@mirthversion</pluginVersion>
 	<mirthVersion>4.5.2</mirthVersion>
-	<url>http://www.nextgen.com</url>
-	<description>This plugin allows you to view the server log on the Mirth Connect administrator.</description>
+	<url>https://openintegrationengine.org</url>
+	<description>This plugin allows you to view the server log on the Open Integration Engine administrator.</description>
 	<serverClasses>
 		<string>com.mirth.connect.plugins.serverlog.ServerLogProvider</string>
 	</serverClasses>

@@ -3,7 +3,7 @@
 	<author>NextGen Healthcare</author>
 	<pluginVersion>@mirthversion</pluginVersion>
 	<mirthVersion>4.5.2</mirthVersion>
-	<url>http://www.nextgen.com</url>
+	<url>https://openintegrationengine.org</url>
 	<description>This plugin provides advanced authentication support for HTTP-based source connectors.</description>
 	<serverClasses>
 		<string>com.mirth.connect.plugins.httpauth.HttpAuthServicePlugin</string>

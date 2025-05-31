@@ -3,8 +3,8 @@
 	<author>NextGen Healthcare</author>
 	<pluginVersion>@mirthversion</pluginVersion>
 	<mirthVersion>4.5.2</mirthVersion>
-	<url>http://www.nextgen.com</url>
-	<description>This plugin provides an External Script step-type for Mirth Connect transformers</description>
+	<url>https://openintegrationengine.org</url>
+	<description>This plugin provides an External Script step-type for Open Integration Engine transformers</description>
 	<clientClasses>
 		<string>com.mirth.connect.plugins.scriptfilestep.ExternalScriptStepPlugin</string>
 	</clientClasses>

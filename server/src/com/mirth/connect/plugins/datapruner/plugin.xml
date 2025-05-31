@@ -3,8 +3,8 @@
 	<author>NextGen Healthcare</author>
 	<pluginVersion>@mirthversion</pluginVersion>
 	<mirthVersion>4.5.2</mirthVersion>
-	<url>http://www.nextgen.com</url>
-	<description>This plugin provides data pruning capability for Mirth Connect</description>
+	<url>https://openintegrationengine.org</url>
+	<description>This plugin provides data pruning capability for Open Integration Engine</description>
 	<serverClasses>
 		<string>com.mirth.connect.plugins.datapruner.DataPrunerService</string>
 	</serverClasses>

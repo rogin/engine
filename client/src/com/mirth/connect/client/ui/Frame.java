@@ -1016,7 +1016,7 @@ public class Frame extends JXFrame {
     private void createViewPane() {
         // Create View pane
         viewPane = new JXTaskPane();
-        viewPane.setTitle(BrandingConstants.PRODUCT_NAME);
+        viewPane.setTitle("Engine");
         viewPane.setName(TaskConstants.VIEW_KEY);
         viewPane.setFocusable(false);
 
@@ -1260,7 +1260,7 @@ public class Frame extends JXFrame {
         addTask(TaskConstants.OTHER_VIEW_USER_API, "View User API", String.format("View documentation for the %s User API.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/page_white_text.png")), otherPane, null);
         addTask(TaskConstants.OTHER_VIEW_CLIENT_API, "View Client API", String.format("View documentation for the %s Client API.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/page_white_text.png")), otherPane, null);
         addTask(TaskConstants.OTHER_HELP, "Help", String.format("View help for %s.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/help.png")), otherPane, null);
-        addTask(TaskConstants.OTHER_ABOUT, String.format("About %s", BrandingConstants.PRODUCT_NAME), String.format("View the about page for %s.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/information.png")), otherPane, null);
+        addTask(TaskConstants.OTHER_ABOUT, "About", String.format("View the about page for %s.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/information.png")), otherPane, null);
         addTask(TaskConstants.OTHER_VISIT_MIRTH, "Visit homepage", String.format("View %s's homepage.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/house.png")), otherPane, null);
         addTask(TaskConstants.OTHER_REPORT_ISSUE, "Report Issue", String.format("Visit %s's issue tracker.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/bug.png")), otherPane, null);
         addTask(TaskConstants.OTHER_LOGOUT, "Logout", "Logout and return to the login screen.", "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/disconnect.png")), otherPane, null);

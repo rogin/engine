@@ -8,8 +8,9 @@
  */
 
 /**
- * This package is included in the JavaScript scope on the server.&nbsp;Classes in this package are
- * part of the supported User API for use in channels/scripts.&nbsp;Reference to any class in Mirth
- * Connect outside of the userutil packages is unsupported.
+ * This package is included in the JavaScript scope on the server. Classes in
+ * this package are part of the supported User API for use in channels/scripts.
+ * Reference to any class in Open Integration Engine outside of the userutil
+ * packages is unsupported.
  */
 package com.mirth.connect.plugins.httpauth.userutil;
