@@ -9,6 +9,9 @@
 
 package com.mirth.connect.client.ui;
 
+import static com.mirth.connect.client.core.BrandingConstants.CENTRAL_USER_REGISTRATION;
+import static com.mirth.connect.client.core.BrandingConstants.MANDATORY_USER_REGISTRATION;
+
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -47,10 +50,14 @@ public class FirstLoginDialog extends javax.swing.JDialog implements UserDialogI
         finishButton.setEnabled(false);
 
         userEditPanel.setUser(this, currentUser);
-        userEditPanel.setRequiredFields(false, true);
-        if (currentUser.getId() == 1) {
-            registerCheckBox.setVisible(false);
-        }
+
+        final boolean isRegistrationMandatory = CENTRAL_USER_REGISTRATION && MANDATORY_USER_REGISTRATION && currentUser.getId() == 1;
+        registerCheckBox.setSelected(isRegistrationMandatory);
+        registerCheckBox.setEnabled(!isRegistrationMandatory);
+        registerCheckBox.setVisible(CENTRAL_USER_REGISTRATION);
+        registerCheckBoxActionPerformed(null);
+        userConsentCheckBox.setVisible(CENTRAL_USER_REGISTRATION);
+        contentTextPane.setVisible(CENTRAL_USER_REGISTRATION);
 
         jLabel2.setForeground(UIConstants.HEADER_TITLE_TEXT_COLOR);
         setModal(true);
@@ -151,7 +158,6 @@ public class FirstLoginDialog extends javax.swing.JDialog implements UserDialogI
         jScrollPane1.setViewportView(jTextPane1);
         
         registerCheckBox.setBackground(new java.awt.Color(255, 255, 255));
-        registerCheckBox.setSelected(true);
         registerCheckBox.setText(String.format("Register user with %s", BrandingConstants.COMPANY_NAME));
         registerCheckBox.setToolTipText(String.format("<html>Register your user information with %s to help us<br>improve the product and provide better service.</html>", BrandingConstants.COMPANY_NAME));
         registerCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -161,7 +167,6 @@ public class FirstLoginDialog extends javax.swing.JDialog implements UserDialogI
         });
         
         userConsentCheckBox.setBackground(new java.awt.Color(255, 255, 255));
-        userConsentCheckBox.setSelected(true);
         userConsentCheckBox.setText(String.format("I consent to receive email updates and marketing messages from %s.", BrandingConstants.COMPANY_NAME));
         userConsentCheckBox.setToolTipText("<html></html>"); 
 
@@ -273,7 +278,7 @@ public class FirstLoginDialog extends javax.swing.JDialog implements UserDialogI
                 return;
             }
 
-            if (registerCheckBox.isSelected()) {
+            if (registerCheckBox.isSelected() && CENTRAL_USER_REGISTRATION) {
                 parent.registerUser(user);
             }
 
@@ -316,7 +321,7 @@ public class FirstLoginDialog extends javax.swing.JDialog implements UserDialogI
         	userConsentCheckBox.setSelected(false);
         	userConsentCheckBox.setEnabled(false);
         }
-        userEditPanel.setRequiredFields(false, true);
+        userEditPanel.setRequiredFields(allRequired, true);
     }//GEN-LAST:event_registerCheckBoxActionPerformed
     
     public boolean getResult() {

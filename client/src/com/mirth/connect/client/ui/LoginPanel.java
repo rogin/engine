@@ -9,6 +9,8 @@
 
 package com.mirth.connect.client.ui;
 
+import static com.mirth.connect.client.core.BrandingConstants.CHECK_FOR_NOTIFICATIONS;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.util.Collections;
@@ -609,7 +611,8 @@ public class LoginPanel extends javax.swing.JFrame {
 
                     // Check for new notifications from update server if enabled
                     String checkForNotifications = userPreferences.getProperty("checkForNotifications");
-                    if (checkForNotifications == null || BooleanUtils.toBoolean(checkForNotifications)) {
+                    if (CHECK_FOR_NOTIFICATIONS 
+                        && (checkForNotifications == null || BooleanUtils.toBoolean(checkForNotifications))) {
                         Set<Integer> archivedNotifications = new HashSet<Integer>();
                         String archivedNotificationString = userPreferences.getProperty("archivedNotifications");
                         if (archivedNotificationString != null) {

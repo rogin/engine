@@ -401,8 +401,10 @@ public class Mirth extends Thread {
         printSplashScreen();
 
         // schedule usage statistics to be sent at startup and every 24 hours
-        Timer timer = new Timer();
-        timer.schedule(new UsageSenderTask(), 0, ConnectServiceUtil.MILLIS_PER_DAY);
+        if (BrandingConstants.SEND_USAGE_STATISTICS) {
+            Timer timer = new Timer();
+            timer.schedule(new UsageSenderTask(), 0, ConnectServiceUtil.MILLIS_PER_DAY);
+        }
     }
 
     /**

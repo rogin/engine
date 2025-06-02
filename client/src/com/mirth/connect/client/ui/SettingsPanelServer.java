@@ -9,6 +9,8 @@
 
 package com.mirth.connect.client.ui;
 
+import static com.mirth.connect.client.core.BrandingConstants.SEND_USAGE_STATISTICS;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -81,8 +83,12 @@ public class SettingsPanelServer extends AbstractSettingsPanel {
         addTask(TaskConstants.SETTINGS_SERVER_RESTORE, "Restore Config", "Restore your server configuration from a server configuration XML file. This will remove and restore your channels, alerts, code templates, server properties, global scripts, and plugin properties.", "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/report_go.png")));
         addTask(TaskConstants.SETTINGS_CLEAR_ALL_STATS, "Clear All Statistics", "Reset the current and lifetime statistics for all channels.", "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/chart_bar_delete.png")));
 
-        provideUsageStatsMoreInfoLabel.setToolTipText(BrandingConstants.PRIVACY_TOOLTIP);
-        provideUsageStatsMoreInfoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        if (!SEND_USAGE_STATISTICS) {
+            provideUsageStatsLabel.setVisible(false);
+            provideUsageStatsYesRadio.setVisible(false);
+            provideUsageStatsNoRadio.setVisible((false));
+            provideUsageStatsMoreInfoLabel.setVisible(false);
+        }
         queueBufferSizeField.setDocument(new MirthFieldConstraints(8, false, false, true));
         smtpTimeoutField.setDocument(new MirthFieldConstraints(0, false, false, false));
         administratorAutoLogoutIntervalField.setDocument(new MirthFieldConstraints(2, false, false, true));
@@ -728,8 +734,8 @@ public class SettingsPanelServer extends AbstractSettingsPanel {
         provideUsageStatsButtonGroup.add(provideUsageStatsNoRadio);
 
         provideUsageStatsMoreInfoLabel = new JLabel("<html><font color=blue><u>More Info</u></font></html>");
-        provideUsageStatsMoreInfoLabel.setEnabled(false);
-        provideUsageStatsMoreInfoLabel.setVisible(false);
+        provideUsageStatsMoreInfoLabel.setToolTipText(BrandingConstants.PRIVACY_TOOLTIP);
+        provideUsageStatsMoreInfoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         provideUsageStatsMoreInfoLabel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 provideUsageStatsMoreInfoLabelMouseClicked(evt);

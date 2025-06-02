@@ -9,6 +9,10 @@
 
 package com.mirth.connect.client.ui;
 
+import static com.mirth.connect.client.core.BrandingConstants.CENTRAL_USER_REGISTRATION;
+import static com.mirth.connect.client.core.BrandingConstants.CHECK_FOR_NOTIFICATIONS;
+import static com.mirth.connect.client.core.BrandingConstants.SEND_USAGE_STATISTICS;
+
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -1250,7 +1254,9 @@ public class Frame extends JXFrame {
         otherPane.setTitle("Other");
         otherPane.setName(TaskConstants.OTHER_KEY);
         otherPane.setFocusable(false);
-        addTask(TaskConstants.OTHER_NOTIFICATIONS, UIConstants.VIEW_NOTIFICATIONS, String.format("View notifications from %s.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/flag_orange.png")), otherPane, null);
+        if (CHECK_FOR_NOTIFICATIONS) {
+            addTask(TaskConstants.OTHER_NOTIFICATIONS, UIConstants.VIEW_NOTIFICATIONS, String.format("View notifications from %s.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/flag_orange.png")), otherPane, null);
+        }
         addTask(TaskConstants.OTHER_VIEW_USER_API, "View User API", String.format("View documentation for the %s User API.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/page_white_text.png")), otherPane, null);
         addTask(TaskConstants.OTHER_VIEW_CLIENT_API, "View Client API", String.format("View documentation for the %s Client API.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/page_white_text.png")), otherPane, null);
         addTask(TaskConstants.OTHER_HELP, "Help", String.format("View help for %s.", BrandingConstants.PRODUCT_NAME), "", new ImageIcon(com.mirth.connect.client.ui.Frame.class.getResource("images/help.png")), otherPane, null);
@@ -1268,6 +1274,10 @@ public class Frame extends JXFrame {
     }
 
     public void updateNotificationTaskName(int notifications) {
+        if (!CHECK_FOR_NOTIFICATIONS) {
+            return;
+        }
+        
         String taskName = UIConstants.VIEW_NOTIFICATIONS;
         if (notifications > 0) {
             taskName += " (" + notifications + ")";
@@ -1949,6 +1959,10 @@ public class Frame extends JXFrame {
     }
 
     public void registerUser(final User user) {
+        if (!CENTRAL_USER_REGISTRATION) {
+            return;
+        }
+
         final String workingId = startWorking("Registering user...");
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
@@ -1972,6 +1986,10 @@ public class Frame extends JXFrame {
     }
 
     public void sendUsageStatistics() {
+        if (!SEND_USAGE_STATISTICS) {
+            return;
+        }
+
         UpdateSettings updateSettings = null;
         try {
             updateSettings = mirthClient.getUpdateSettings();

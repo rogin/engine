@@ -51,21 +51,27 @@ import org.apache.http.util.EntityUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.github.zafarkhaja.semver.Version;
+
 import com.mirth.connect.model.User;
 import com.mirth.connect.model.converters.ObjectXMLSerializer;
 import com.mirth.connect.model.notification.Notification;
 import com.mirth.connect.util.MirthSSLUtil;
 
 public class ConnectServiceUtil {
-    private final static String URL_CONNECT_SERVER = "https://connect.mirthcorp.com";
+    private final static String URL_CONNECT_SERVER = BrandingConstants.CONNECT_SERVER_URL;
     private final static String URL_REGISTRATION_SERVLET = "/RegistrationServlet";
     private final static String URL_USAGE_SERVLET = "/UsageStatisticsServlet";
-    private static String URL_NOTIFICATIONS = "https://api.github.com/repos/openintegrationengine/engine/releases";
+    private static String URL_NOTIFICATIONS = BrandingConstants.NOTIFICATIONS_URL;
     private final static int TIMEOUT = 10000;
     public final static Integer MILLIS_PER_DAY = 86400000;
 
     public static void registerUser(String serverId, String mirthVersion, User user, String[] protocols, String[] cipherSuites) throws ClientException {
+        if (!BrandingConstants.CENTRAL_USER_REGISTRATION) {
+            throw new UnsupportedOperationException("User Registration is disabled");
+        }
+
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse httpResponse = null;
         NameValuePair[] params = { new BasicNameValuePair("serverId", serverId),
@@ -107,6 +113,10 @@ public class ConnectServiceUtil {
      * @throws Exception should anything fail dealing with the web request and the handling of its response
      */
     public static List<Notification> getNotifications(String serverId, String mirthVersion, Map<String, String> extensionVersions, String[] protocols, String[] cipherSuites) throws Exception {
+        if (!BrandingConstants.CHECK_FOR_NOTIFICATIONS) {
+            throw new UnsupportedOperationException("Checking for Notifications is disabled.");
+        }
+        
         List<Notification> validNotifications = Collections.emptyList();
         Optional<Version> parsedMirthVersion = Version.tryParse(mirthVersion);
         if (!parsedMirthVersion.isPresent()) {
@@ -208,6 +218,10 @@ public class ConnectServiceUtil {
     }
 
     public static int getNotificationCount(String serverId, String mirthVersion, Map<String, String> extensionVersions, Set<Integer> archivedNotifications, String[] protocols, String[] cipherSuites) {
+        if (!BrandingConstants.CHECK_FOR_NOTIFICATIONS) {
+            throw new UnsupportedOperationException("Checking for Notifications is disabled.");
+        }
+
         Long notificationCount = 0L;
         try {
             notificationCount = getNotifications(serverId, mirthVersion, extensionVersions, protocols, cipherSuites)
@@ -222,6 +236,10 @@ public class ConnectServiceUtil {
     }
 
     public static boolean sendStatistics(String serverId, String mirthVersion, boolean server, String data, String[] protocols, String[] cipherSuites) {
+        if (!BrandingConstants.SEND_USAGE_STATISTICS) {
+            throw new UnsupportedOperationException("Sending Usage Statistics is disabled.");
+        }
+        
         if (data == null) {
             return false;
         }
