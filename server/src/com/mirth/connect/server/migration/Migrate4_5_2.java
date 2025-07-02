@@ -2,6 +2,7 @@ package com.mirth.connect.server.migration;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -36,8 +37,12 @@ public class Migrate4_5_2 extends Migrator implements ConfigurationMigrator {
 
             builder.save();
             
-            // Update log4j2-cli.properties
-            builder = PropertiesConfigurationUtil.createBuilder(new File(ClassPathResource.getResourceURI("log4j2-cli.properties")));
+            // Update log4j2-cli.properties, if exists
+            URI cliUri = ClassPathResource.getResourceURI("log4j2-cli.properties");
+
+            if(cliUri == null) return;
+
+            builder = PropertiesConfigurationUtil.createBuilder(new File(cliUri));
             log4jproperties = builder.getConfiguration();
 
             consoleCharset = (String) log4jproperties.getProperty("appender.console.layout.charset");
