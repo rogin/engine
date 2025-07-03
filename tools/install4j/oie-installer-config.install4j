@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="11.0.3" transformSequenceNumber="11">
-  <directoryPresets config="/Users/dbugger/projects/governance/branding/icons" />
-  <application name="Open Integration Engine" applicationId="4145-9206-7630-8076" mediaDir="${compiler:installer:mediaRoot}/server/build" shortName="oie" publisher="Open Integration Engine Project" publisherWeb="https://openintegrationengine.com" version="4.5.2" backupOnSave="true" autoSave="true" macVolumeId="88477e584eb462ba" javaMinVersion="17">
+  <application name="Open Integration Engine" applicationId="4145-9206-7630-8076" mediaDir="${compiler:installer:mediaRoot}/server/build" shortName="oie" publisher="Open Integration Engine Project" publisherWeb="https://openintegrationengine.com" version="4.5.2" backupOnSave="true" autoSave="true" macVolumeId="88477e584eb462ba" javaMinVersion="17" javaMaxVersion="25">
     <variables>
       <variable name="installer:mediaRoot" value="../../../engine" />
     </variables>
@@ -312,8 +311,17 @@ return console.askOkCancel(message, true);
 &lt;/body&gt;
 &lt;/html&gt;
 </property>
+                  <property name="displayedTextFile" id="LocalizedExternalFile0">
+                    <property name="languageIdToExternalFile">
+                      <entry>
+                        <string>en</string>
+                        <object class="com.install4j.api.beans.ExternalFile">
+                          <string>${compiler:installer:mediaRoot}/tools/install4j/readme.html</string>
+                        </object>
+                      </entry>
+                    </property>
+                  </property>
                   <property name="fillVertical" type="boolean" value="true" />
-                  <property name="textSource" type="enum" class="com.install4j.runtime.beans.screens.components.TextSource" value="DIRECT" />
                 </serializedBean>
                 <externalParametrizationPropertyNames>
                   <propertyName>textSource</propertyName>
@@ -827,9 +835,7 @@ return console.askYesNo(message, true);
       <jreBundle jreBundleSource="none" />
     </windowsArchive>
   </mediaSets>
-  <buildIds>
-    <mediaSet refId="43" />
-    <mediaSet refId="151" />
-    <mediaSet refId="153" />
+  <buildIds buildAll="false">
+    <mediaSet refId="136" />
   </buildIds>
 </install4j>
