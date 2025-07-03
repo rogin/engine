@@ -49,7 +49,6 @@ public class MirthTimePicker extends JSpinner {
     public void init(String format, int accuracy) {
         this.parent = PlatformUI.MIRTH_FRAME;
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         GregorianCalendar calendar = new GregorianCalendar();
         Date now = calendar.getTime();
         SpinnerDateModel dateModel = new SpinnerDateModel(now, null, null, accuracy);
@@ -70,9 +69,7 @@ public class MirthTimePicker extends JSpinner {
             public void keyReleased(KeyEvent e) {}
         });
 
-        DefaultFormatterFactory factory = (DefaultFormatterFactory) tf.getFormatterFactory();
-        formatter = (DateFormatter) factory.getDefaultFormatter();
-        formatter.setFormat(dateFormat);
+        setFormatter(format);
         fireStateChanged();
 
         this.addChangeListener(new ChangeListener() {
@@ -83,6 +80,15 @@ public class MirthTimePicker extends JSpinner {
                 }
             }
         });
+    }
+
+    public void setFormatter(String formatString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(formatString);
+        JFormattedTextField tf = ((JSpinner.DefaultEditor) getEditor()).getTextField();
+        DefaultFormatterFactory factory = (DefaultFormatterFactory) tf.getFormatterFactory();
+        formatter = (DateFormatter) factory.getDefaultFormatter();
+        formatter.setFormat(dateFormat);
+        fireStateChanged();
     }
 
     public void setSaveEnabled(boolean saveEnabled) {
