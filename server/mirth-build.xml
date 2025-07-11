@@ -122,6 +122,10 @@
 		</copy>
 	</target>
 
+	<target name="build-time-tests" unless="disableTests">
+		<antcall target="test-run" />
+	</target>
+
 	<target name="build" depends="build-manager, build-cli, build-webadmin">
 		<ant antfile="${server}/build.xml" dir="${server}" target="create-setup">
 			<property name="version" value="${version}" />
@@ -135,7 +139,7 @@
 			<fileset dir="${server.setup}/client-lib" />
 		</copy>
 		
-		<antcall target="test-run" />
+		<antcall target="build-time-tests" />
 	</target>
 
 	<target name="dist" depends="build-manager, build-cli, build-webadmin">
