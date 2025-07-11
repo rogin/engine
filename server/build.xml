@@ -1051,22 +1051,6 @@
 		
 		<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="classpath" />
 
-		<!-- modify jar manifests -->
-		<!-- don't modify bcprov, since it already has the manifest changes and is signed by BC -->
-		<echo message="[Thread Count: ${manifest_thread_count}] Modifying jar manifests to add Permissions: all-permissions; Codebase: *; Application-Name: Mirth Connect" />
-		<for param="jarFile" parallel="true" threadCount="${manifest_thread_count}">
-	    	<fileset dir="${setup.client.lib}" includes="**/*.jar" excludes="bcp*.jar,bcutil*.jar"/>
-	    	<fileset dir="${setup.extensions}" includes="**/*.jar" />
-			<sequential>
-				<apply executable="jar">
-			        <arg value="umf" />
-			        <arg line="custom_manifest.mf" />
-			        <srcfile />
-			    	<fileset file="@{jarFile}"/>
-			    </apply>
-			</sequential>
-		</for>
-
 
 		<if>
 			<equals arg1="${disableSigning}" arg2="true" />
@@ -1076,6 +1060,22 @@
 			</then>
 
 			<else>
+				<!-- modify jar manifests -->
+				<!-- don't modify bcprov, since it already has the manifest changes and is signed by BC -->
+				<echo message="[Thread Count: ${manifest_thread_count}] Modifying jar manifests to add Permissions: all-permissions; Codebase: *; Application-Name: Mirth Connect" />
+				<for param="jarFile" parallel="true" threadCount="${manifest_thread_count}">
+					<fileset dir="${setup.client.lib}" includes="**/*.jar" excludes="bcp*.jar,bcutil*.jar"/>
+					<fileset dir="${setup.extensions}" includes="**/*.jar" />
+					<sequential>
+						<apply executable="jar">
+							<arg value="umf" />
+							<arg line="custom_manifest.mf" />
+							<srcfile />
+							<fileset file="@{jarFile}"/>
+						</apply>
+					</sequential>
+				</for>
+
 				<property file="${keystore_property_file}" />
 				<property name="signingTsa" value="http://timestamp.digicert.com" />
 
