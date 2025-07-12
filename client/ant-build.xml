@@ -46,7 +46,6 @@
 		<property name="plugins.dashboardstatus" value="${extensions}/dashboardstatus" />
 		<property name="plugins.destinationsetfilter" value="${extensions}/destinationsetfilter" />
 		<property name="plugins.dicomviewer" value="${extensions}/dicomviewer" />
-		<property name="plugins.extensionmanager" value="${extensions}/extensionmanager" />
 		<property name="plugins.httpauth" value="${extensions}/httpauth" />
 		<property name="plugins.imageviewer" value="${extensions}/imageviewer" />
 		<property name="plugins.javascriptrule" value="${extensions}/javascriptrule" />
@@ -234,11 +233,6 @@
 			<include name="com/mirth/connect/plugins/dicomviewer/**" />
 		</jar>
 
-		<mkdir dir="${plugins.extensionmanager}" />
-		<jar destfile="${plugins.extensionmanager}/extensionmanager-client.jar" basedir="${classes}">
-			<include name="com/mirth/connect/plugins/extensionmanager/**" />
-		</jar>
-		
 		<mkdir dir="${plugins.globalmapviewer}" />
 		<jar destfile="${plugins.globalmapviewer}/globalmapviewer-client.jar" basedir="${classes}">
 			<include name="com/mirth/connect/plugins/globalmapviewer/**" />
