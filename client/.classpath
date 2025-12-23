@@ -122,7 +122,6 @@
 	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/looks-2.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/xercesImpl-2.12.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.13.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang3-3.13.0.jar">
 		<attributes>
@@ -213,7 +212,6 @@
 	<classpathentry kind="lib" path="lib/xstream-1.4.20.jar"/>
 	<classpathentry kind="lib" path="lib/libphonenumber-8.12.50.jar"/>
 	<classpathentry kind="lib" path="lib/commons-pool2-2.3.jar"/>
-	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar"/>
 	<classpathentry kind="lib" path="lib/java-semver-0.10.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
