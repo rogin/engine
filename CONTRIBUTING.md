@@ -26,8 +26,30 @@ git checkout -b feature/your-feature-name
 ```
 
 ### 5. Install Tooling
-OIE specifies the working versions of Java and Ant in [.sdkmanrc](./.sdkmanrc). To take advantage of this, install [SDKMAN](https://sdkman.io/) and run `sdk env install`
-in the project's root directory.
+OIE specifies the working Java version in [.sdkmanrc](./.sdkmanrc). To take advantage of this, install [SDKMAN](https://sdkman.io/) and run `sdk env install`
+in the project's root directory. No other tooling is required.
+
+### 5a. Build
+The build is driven by Gradle through the included wrapper; no separate Gradle install is needed:
+```bash
+./gradlew build -PdisableSigning=true   # full build without jar signing
+./gradlew test                          # run the unit tests (-Pcoverage=true for JaCoCo)
+./gradlew dist                          # build the distribution extension zips
+```
+On Windows use `gradlew.bat` instead of `./gradlew`. The assembled distribution lands in `server/setup`, the same location the previous Ant build used. For release artifacts, run a clean build: `./gradlew clean build dist`.
+
+Dependencies are pinned and checksum-verified. To change a dependency version: edit `gradle/libs.versions.toml`, then run `./gradlew --write-verification-metadata sha256 help` to refresh the checksum metadata. Only when adding a **new** artifact that ships in the distribution does `gradle/vendored-layout.json` need a one-line placement entry, and the build fails with a message telling you so.
+
+### Run and debug
+
+```bash
+./gradlew :server:createDerbyDb     # one-time: create the embedded database
+./gradlew :server:devRun            # run the server from the development tree
+./gradlew :server:devLauncher       # run the server the way production starts it (from server/setup)
+./gradlew :client:devClient         # run the administrator client against https://localhost:8443
+```
+
+Add `--debug-jvm` to any of these to suspend on JVM start and attach a debugger on port 5005. The JDK module flags come from `server/conf/default_modules.vmoptions`, the same file the production launcher uses. For IDEs, import the repository as a Gradle project (IntelliJ does this natively; Eclipse via Buildship); the old `.classpath`/`.project` files are gone on purpose.
 
 ### 6. Implement your changes
 
