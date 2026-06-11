@@ -53,6 +53,11 @@ dependencyCheck {
     nvd {
         apiKey = System.getenv('NVD_API_KEY') ?: ''
     }
+    // the distribution ships no .NET assemblies, and the analyzer
+    // hard-fails the whole scan on machines without a dotnet runtime
+    analyzers {
+        assemblyEnabled = false
+    }
     // also scan the jars that remain vendored (no Maven coordinates)
     scanSet = subprojects.collect { it.file('lib') }.findAll { it.directory }
 }
