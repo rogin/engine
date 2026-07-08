@@ -1,11 +1,5 @@
-/*
- * Copyright (c) Mirth Corporation. All rights reserved.
- * 
- * http://www.mirthcorp.com
- * 
- * The software in this package is published under the terms of the MPL license a copy of which has
- * been included with this distribution in the LICENSE.txt file.
- */
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: Mirth Corporation
 
 package com.mirth.connect.connectors.http;
 
@@ -14,8 +8,6 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.mirth.connect.client.core.api.MirthApiException;
 import com.mirth.connect.server.api.MirthServlet;
@@ -36,9 +28,22 @@ public class HttpConnectorServlet extends MirthServlet implements HttpConnectorS
     public ConnectionTestResponse testConnection(String channelId, String channelName, HttpDispatcherProperties properties) {
         try {
             URL url = new URL(replacer.replaceValues(properties.getHost(), channelId, channelName));
-            int port = url.getPort();
             // If no port was provided, default to port 80 or 443.
-            return ConnectorUtil.testConnection(url.getHost(), (port == -1) ? (StringUtils.equalsIgnoreCase(url.getProtocol(), "https") ? 443 : 80) : port, TIMEOUT);
+            final int port;
+            if (url.getPort() != -1) {
+                port = url.getPort();
+            } else if ("https".equalsIgnoreCase(url.getProtocol())) {
+                port = 443;
+            } else {
+                port = 80;
+            }
+
+            if (!properties.isOverrideLocalBinding()) {
+                return ConnectorUtil.testConnection(url.getHost(), port, TIMEOUT);
+            } else {
+                String localAddr = replacer.replaceValues(properties.getLocalAddress(), channelId, channelName);
+                return ConnectorUtil.testConnection(url.getHost(), port, TIMEOUT, localAddr);
+            }
         } catch (Exception e) {
             throw new MirthApiException(e);
         }

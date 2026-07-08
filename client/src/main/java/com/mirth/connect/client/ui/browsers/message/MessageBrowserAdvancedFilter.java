@@ -11,8 +11,10 @@ package com.mirth.connect.client.ui.browsers.message;
 
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -28,6 +30,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -508,6 +512,81 @@ public class MessageBrowserAdvancedFilter extends MirthDialog {
         }
 
         return hasAdvancedCriteria;
+    }
+
+    public void applyFilter(MessageFilter messageFilter) {
+        stopEditing();
+        resetSelections();
+
+        if (messageFilter == null) {
+            return;
+        }
+
+        ItemSelectionTableModel<Integer, String> connectorModel = ((ItemSelectionTableModel<Integer, String>) connectorTable.getModel());
+        DefaultTableModel contentSearchModel = ((DefaultTableModel) contentSearchTable.getModel());
+        DefaultTableModel metaDataSearchModel = ((DefaultTableModel) metaDataSearchTable.getModel());
+
+        List<Integer> includedMetaDataIds = messageFilter.getIncludedMetaDataIds();
+        List<Integer> excludedMetaDataIds = messageFilter.getExcludedMetaDataIds();
+
+        if (includedMetaDataIds != null) {
+            connectorModel.unselectAllKeys();
+            for (Integer metaDataId : includedMetaDataIds) {
+                connectorModel.selectKey(metaDataId);
+            }
+        } else if (excludedMetaDataIds != null) {
+            connectorModel.selectAllKeys();
+            for (int row = 0; row < connectorModel.getRowCount(); row++) {
+                Integer metaDataId = (Integer) connectorModel.getValueAt(row, ItemSelectionTableModel.KEY_COLUMN);
+                if (excludedMetaDataIds.contains(metaDataId)) {
+                    connectorModel.setValueAt(Boolean.FALSE, row, ItemSelectionTableModel.CHECKBOX_COLUMN);
+                }
+            }
+        }
+
+        messageIdLowerField.setText(Objects.toString(messageFilter.getMinMessageId(), ""));
+        messageIdUpperField.setText(Objects.toString(messageFilter.getMaxMessageId(), ""));
+        originalIdLowerField.setText(Objects.toString(messageFilter.getOriginalIdLower(), ""));
+        originalIdUpperField.setText(Objects.toString(messageFilter.getOriginalIdUpper(), ""));
+        importIdLowerField.setText(Objects.toString(messageFilter.getImportIdLower(), ""));
+        importIdUpperField.setText(Objects.toString(messageFilter.getImportIdUpper(), ""));
+        serverIdField.setText(StringUtils.defaultString(messageFilter.getServerId()));
+        sendAttemptsLower.setValue((messageFilter.getSendAttemptsLower() == null) ? 0 : messageFilter.getSendAttemptsLower());
+        sendAttemptsUpper.setValue(Objects.toString(messageFilter.getSendAttemptsUpper(), ""));
+        attachmentCheckBox.setSelected(Boolean.TRUE.equals(messageFilter.getAttachment()));
+        errorCheckBox.setSelected(Boolean.TRUE.equals(messageFilter.getError()));
+
+        if (messageFilter.getContentSearch() != null) {
+            for (ContentSearchElement contentSearchElement : messageFilter.getContentSearch()) {
+                for (String search : contentSearchElement.getSearches()) {
+                    contentSearchModel.addRow(new Object[] { ContentType.fromCode(contentSearchElement.getContentCode()), search });
+                }
+            }
+        }
+
+        if (messageFilter.getMetaDataSearch() != null) {
+            for (MetaDataSearchElement metaDataSearchElement : messageFilter.getMetaDataSearch()) {
+                if (cachedMetaDataColumns.containsKey(metaDataSearchElement.getColumnName())) {
+                    metaDataSearchModel.addRow(new Object[] {
+                            metaDataSearchElement.getColumnName(),
+                            MetaDataSearchOperator.fromString(metaDataSearchElement.getOperator()),
+                            formatMetaDataValue(metaDataSearchElement.getValue()),
+                            Boolean.TRUE.equals(metaDataSearchElement.getIgnoreCase()) });
+                }
+            }
+        }
+    }
+
+    private String formatMetaDataValue(Object value) {
+        if (value == null) {
+            return "";
+        }
+
+        if (value instanceof Calendar calendar) {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
+        }
+
+        return String.valueOf(value);
     }
 
     private void stopEditing() {

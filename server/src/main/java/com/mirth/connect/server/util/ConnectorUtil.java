@@ -1,11 +1,5 @@
-/*
- * Copyright (c) Mirth Corporation. All rights reserved.
- * 
- * http://www.mirthcorp.com
- * 
- * The software in this package is published under the terms of the MPL license a copy of which has
- * been included with this distribution in the LICENSE.txt file.
- */
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: Mirth Corporation
 
 package com.mirth.connect.server.util;
 
@@ -20,6 +14,10 @@ import com.mirth.connect.util.ConnectionTestResponse;
 public class ConnectorUtil {
     public static ConnectionTestResponse testConnection(String host, int port, int timeout) throws Exception {
         return testConnection(host, port, timeout, null, 0);
+    }
+
+    public static ConnectionTestResponse testConnection(String host, int port, int timeout, String localAddr) throws Exception {
+        return testConnection(host, port, timeout, localAddr, 0);
     }
 
     public static ConnectionTestResponse testConnection(String host, int port, int timeout, String localAddr, int localPort) throws Exception {
