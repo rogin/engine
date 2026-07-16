@@ -9,6 +9,7 @@
 
 package com.mirth.connect.server.util.javascript;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.junit.After;
@@ -30,6 +32,8 @@ import org.junit.Test;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.mirth.connect.donkey.model.message.ConnectorMessage;
+import com.mirth.connect.donkey.model.message.MessageContent;
 import com.mirth.connect.model.codetemplates.ContextType;
 import com.mirth.connect.server.builders.JavaScriptBuilder;
 import com.mirth.connect.server.controllers.CodeTemplateController;
@@ -37,6 +41,7 @@ import com.mirth.connect.server.controllers.ConfigurationController;
 import com.mirth.connect.server.controllers.ControllerFactory;
 import com.mirth.connect.server.controllers.EventController;
 import com.mirth.connect.server.controllers.ExtensionController;
+import com.mirth.connect.server.controllers.ScriptController;
 import com.mirth.connect.server.util.CompiledScriptCache;
 
 public class JavaScriptUtilTest {
@@ -129,5 +134,51 @@ public class JavaScriptUtilTest {
         boolean inserted = JavaScriptUtil.compileAndAddScript("channelId", contextFactory(), SCRIPT_ID, "var x = 1; return 'x';", ContextType.CHANNEL_PREPROCESSOR);
         assertTrue(inserted);
         assertNotNull(CompiledScriptCache.getInstance().getCompiledScript(SCRIPT_ID));
+    }
+
+    private static final String CHANNEL_ID = "JavaScriptUtilTest-channel";
+
+    private ConnectorMessage messageWithRaw() {
+        ConnectorMessage message = mock(ConnectorMessage.class);
+        MessageContent rawContent = mock(MessageContent.class);
+        when(message.getRaw()).thenReturn(rawContent);
+        when(rawContent.getContent()).thenReturn("MSH|^~\\&|X");
+        when(message.getChannelId()).thenReturn(CHANNEL_ID);
+        return message;
+    }
+
+    private JavaScriptTask<Object> task(MirthContextFactory contextFactory) {
+        return new JavaScriptTask<>(contextFactory, "JavaScriptUtilTest") {
+            @Override
+            public Object doCall() {
+                return null;
+            }
+        };
+    }
+
+    @Test
+    public void preprocessorReturningNothingYieldsNullNotUndefined() throws Exception {
+        String scriptId = ScriptController.getScriptId(ScriptController.PREPROCESSOR_SCRIPT_KEY, CHANNEL_ID);
+        MirthContextFactory contextFactory = contextFactory();
+        try {
+            JavaScriptUtil.compileAndAddScript(CHANNEL_ID, contextFactory, scriptId, "var unused = 1;", ContextType.CHANNEL_PREPROCESSOR);
+            String result = JavaScriptUtil.executePreprocessorScripts(task(contextFactory), messageWithRaw(), new HashMap<>(), null);
+            assertNull(result);
+        } finally {
+            CompiledScriptCache.getInstance().removeCompiledScript(scriptId);
+        }
+    }
+
+    @Test
+    public void preprocessorReturningStringYieldsThatString() throws Exception {
+        String scriptId = ScriptController.getScriptId(ScriptController.PREPROCESSOR_SCRIPT_KEY, CHANNEL_ID);
+        MirthContextFactory contextFactory = contextFactory();
+        try {
+            JavaScriptUtil.compileAndAddScript(CHANNEL_ID, contextFactory, scriptId, "return 'processed';", ContextType.CHANNEL_PREPROCESSOR);
+            String result = JavaScriptUtil.executePreprocessorScripts(task(contextFactory), messageWithRaw(), new HashMap<>(), null);
+            assertEquals("processed", result);
+        } finally {
+            CompiledScriptCache.getInstance().removeCompiledScript(scriptId);
+        }
     }
 }

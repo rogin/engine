@@ -197,7 +197,7 @@ public class JavaScriptUtil {
                 }
             }
 
-            if (result != null) {
+            if (result != null && !(result instanceof Undefined)) {
                 String resultString = (String) Context.jsToJava(result, java.lang.String.class);
 
                 // Set the processed message in case something goes wrong in the channel processor. Also update the global result so the channel processor uses the updated message
@@ -226,7 +226,7 @@ public class JavaScriptUtil {
                 }
             }
 
-            if (result != null) {
+            if (result != null && !(result instanceof Undefined)) {
                 String resultString = (String) Context.jsToJava(result, java.lang.String.class);
 
                 // Set the processed message if there was a result.
