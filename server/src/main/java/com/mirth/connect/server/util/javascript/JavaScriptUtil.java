@@ -710,6 +710,13 @@ public class JavaScriptUtil {
         // Note: If the defaultScript is NULL, this means that the script should
         // always be inserted without being compared.
 
+        // A null or blank script does nothing; treat it as absent instead of
+        // compiling a wrapper whose body is the literal string "null" (MIRTH/OIE #344)
+        if (StringUtils.isBlank(script)) {
+            compiledScriptCache.removeCompiledScript(scriptId);
+            return false;
+        }
+
         boolean scriptInserted = false;
         String generatedScript = null;
 

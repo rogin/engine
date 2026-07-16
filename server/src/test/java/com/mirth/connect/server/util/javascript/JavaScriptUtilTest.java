@@ -1,0 +1,133 @@
+/*
+ * Copyright (c) Mirth Corporation. All rights reserved.
+ *
+ * http://www.mirthcorp.com
+ *
+ * The software in this package is published under the terms of the MPL license a copy of which has
+ * been included with this distribution in the LICENSE.txt file.
+ */
+
+package com.mirth.connect.server.util.javascript;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashSet;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.mirth.connect.model.codetemplates.ContextType;
+import com.mirth.connect.server.builders.JavaScriptBuilder;
+import com.mirth.connect.server.controllers.CodeTemplateController;
+import com.mirth.connect.server.controllers.ConfigurationController;
+import com.mirth.connect.server.controllers.ControllerFactory;
+import com.mirth.connect.server.controllers.EventController;
+import com.mirth.connect.server.controllers.ExtensionController;
+import com.mirth.connect.server.util.CompiledScriptCache;
+
+public class JavaScriptUtilTest {
+
+    private static final String SCRIPT_ID = "JavaScriptUtilTest-script";
+
+    private static ClassLoader originalContextClassLoader;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        /*
+         * mirth.properties isn't on the unit test classpath, but JavaScriptScopeUtil's static init
+         * requires it to be resolvable via the context classloader. Point the context classloader
+         * at the real conf/ dir; restored after the class.
+         */
+        originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+        URL confDir = new File("conf").toURI().toURL();
+        Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[] { confDir }, originalContextClassLoader));
+
+        // Same mocked ControllerFactory pattern as FileReceiverTest, so this class is
+        // self-sufficient regardless of which test classes ran (and injected) before it.
+        ControllerFactory controllerFactory = mock(ControllerFactory.class);
+
+        EventController eventController = mock(EventController.class);
+        when(controllerFactory.createEventController()).thenReturn(eventController);
+
+        ConfigurationController configurationController = mock(ConfigurationController.class);
+        when(controllerFactory.createConfigurationController()).thenReturn(configurationController);
+
+        ExtensionController extensionController = mock(ExtensionController.class);
+        when(controllerFactory.createExtensionController()).thenReturn(extensionController);
+
+        CodeTemplateController codeTemplateController = mock(CodeTemplateController.class);
+        when(controllerFactory.createCodeTemplateController()).thenReturn(codeTemplateController);
+
+        Injector injector = Guice.createInjector(new AbstractModule() {
+            @Override
+            protected void configure() {
+                requestStaticInjection(ControllerFactory.class);
+                bind(ControllerFactory.class).toInstance(controllerFactory);
+            }
+        });
+        injector.getInstance(ControllerFactory.class);
+
+        /*
+         * JavaScriptBuilder captures its controllers in static fields at class-load time. If an
+         * earlier test class loaded it with a mocked factory that left them null, repair them so
+         * generateGlobalSealedScript/appendCodeTemplates don't NPE.
+         */
+        setJavaScriptBuilderStaticField("extensionController", extensionController);
+        setJavaScriptBuilderStaticField("codeTemplateController", codeTemplateController);
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() {
+        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+    }
+
+    private static void setJavaScriptBuilderStaticField(String fieldName, Object value) throws Exception {
+        Field field = JavaScriptBuilder.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(null, value);
+    }
+
+    private MirthContextFactory contextFactory() {
+        return new MirthContextFactory(new URL[0], new HashSet<>(), false);
+    }
+
+    @After
+    public void cleanup() {
+        CompiledScriptCache.getInstance().removeCompiledScript(SCRIPT_ID);
+    }
+
+    @Test
+    public void compileAndAddScriptWithNullScriptDoesNotCompile() throws Exception {
+        boolean inserted = JavaScriptUtil.compileAndAddScript("channelId", contextFactory(), SCRIPT_ID, null, ContextType.CHANNEL_PREPROCESSOR);
+        assertFalse(inserted);
+        assertNull(CompiledScriptCache.getInstance().getCompiledScript(SCRIPT_ID));
+    }
+
+    @Test
+    public void compileAndAddScriptWithBlankScriptDoesNotCompile() throws Exception {
+        boolean inserted = JavaScriptUtil.compileAndAddScript("channelId", contextFactory(), SCRIPT_ID, "   \n", ContextType.CHANNEL_PREPROCESSOR);
+        assertFalse(inserted);
+        assertNull(CompiledScriptCache.getInstance().getCompiledScript(SCRIPT_ID));
+    }
+
+    @Test
+    public void compileAndAddScriptWithRealScriptCompiles() throws Exception {
+        boolean inserted = JavaScriptUtil.compileAndAddScript("channelId", contextFactory(), SCRIPT_ID, "var x = 1; return 'x';", ContextType.CHANNEL_PREPROCESSOR);
+        assertTrue(inserted);
+        assertNotNull(CompiledScriptCache.getInstance().getCompiledScript(SCRIPT_ID));
+    }
+}
