@@ -129,7 +129,7 @@ public class JavaScriptUtil {
             throw e;
         }
 
-        if (result != null) {
+        if (result != null && !(Undefined.isUndefined(result))) {
             String resultString = (String) Context.jsToJava(result, java.lang.String.class);
 
             if (resultString != null) {
@@ -197,7 +197,7 @@ public class JavaScriptUtil {
                 }
             }
 
-            if (result != null && !(result instanceof Undefined)) {
+            if (result != null && !(Undefined.isUndefined(result))) {
                 String resultString = (String) Context.jsToJava(result, java.lang.String.class);
 
                 // Set the processed message in case something goes wrong in the channel processor. Also update the global result so the channel processor uses the updated message
@@ -226,7 +226,7 @@ public class JavaScriptUtil {
                 }
             }
 
-            if (result != null && !(result instanceof Undefined)) {
+            if (result != null && !(Undefined.isUndefined(result))) {
                 String resultString = (String) Context.jsToJava(result, java.lang.String.class);
 
                 // Set the processed message if there was a result.
@@ -330,7 +330,7 @@ public class JavaScriptUtil {
                 // TODO: is it okay that we use Status.SENT here?
                 response = new Response(Status.SENT, object.toString());
             }
-        } else if ((result != null) && !(result instanceof Undefined)) {
+        } else if ((result != null) && !(Undefined.isUndefined(result))) {
             // This branch will catch all objects that aren't Response, NativeJavaObject, Undefined, or null
             // Assume it's a string, and return a successful response
             // TODO: is it okay that we use Status.SENT here?

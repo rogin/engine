@@ -17,15 +17,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.lang.reflect.Field;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -48,19 +44,8 @@ public class JavaScriptUtilTest {
 
     private static final String SCRIPT_ID = "JavaScriptUtilTest-script";
 
-    private static ClassLoader originalContextClassLoader;
-
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        /*
-         * mirth.properties isn't on the unit test classpath, but JavaScriptScopeUtil's static init
-         * requires it to be resolvable via the context classloader. Point the context classloader
-         * at the real conf/ dir; restored after the class.
-         */
-        originalContextClassLoader = Thread.currentThread().getContextClassLoader();
-        URL confDir = new File("conf").toURI().toURL();
-        Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[] { confDir }, originalContextClassLoader));
-
+    public static void setUpBeforeClass() {
         // Same mocked ControllerFactory pattern as FileReceiverTest, so this class is
         // self-sufficient regardless of which test classes ran (and injected) before it.
         ControllerFactory controllerFactory = mock(ControllerFactory.class);
@@ -91,19 +76,7 @@ public class JavaScriptUtilTest {
          * earlier test class loaded it with a mocked factory that left them null, repair them so
          * generateGlobalSealedScript/appendCodeTemplates don't NPE.
          */
-        setJavaScriptBuilderStaticField("extensionController", extensionController);
-        setJavaScriptBuilderStaticField("codeTemplateController", codeTemplateController);
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() {
-        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-    }
-
-    private static void setJavaScriptBuilderStaticField(String fieldName, Object value) throws Exception {
-        Field field = JavaScriptBuilder.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(null, value);
+        JavaScriptBuilder.setControllersForTesting(extensionController, codeTemplateController);
     }
 
     private MirthContextFactory contextFactory() {
