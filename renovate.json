@@ -1,16 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
-  ],
-  "schedule": [
-    "before 6am on the first day of the month"
+    "config:recommended",
+    "schedule:monthly"
   ],
   "timezone": "America/New_York",
-  "minimumReleaseAge": "2 days",
+  "minimumReleaseAge": "14 days",
   "prConcurrentLimit": 10,
   "prHourlyLimit": 2,
   "automerge": false,
+  "rebaseWhen": "conflicted",
   "major": {
     "dependencyDashboardApproval": true
   },
@@ -39,14 +38,6 @@
       ]
     },
     {
-      "description": "Catch-all: bundle minor/patch of ungrouped deps; majors stay individual. Listed BEFORE the named groups so a family's own minor/patch is overridden back into its family group (Renovate merges rules, last match wins for groupName).",
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "groupName": "all-minor-and-patch"
-    },
-    {
       "groupName": "aws-sdk",
       "matchPackageNames": [
         "software.amazon.awssdk:*",
@@ -60,10 +51,28 @@
       ]
     },
     {
+      "groupName": "bouncycastle",
+      "matchPackageNames": [
+        "org.bouncycastle*"
+      ]
+    },
+    {
       "groupName": "jersey",
       "matchPackageNames": [
         "org.glassfish.jersey*",
         "org.glassfish.hk2*"
+      ]
+    },
+    {
+      "groupName": "pdfbox",
+      "matchPackageNames": [
+        "*pdfbox*"
+      ]
+    },
+    {
+      "groupName": "sun-xml",
+      "matchPackageNames": [
+        "com.sun.xml*"
       ]
     },
     {
