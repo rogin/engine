@@ -147,9 +147,9 @@ public class DestinationSetFilterStep extends Step {
 
         script.append("{\n\tdestinationSet.");
         if (behavior == Behavior.REMOVE) {
-            script.append("remove");
+            script.append("removeAll");
         } else if (behavior == Behavior.REMOVE_ALL_EXCEPT) {
-            script.append("removeAllExcept");
+            script.append("retainAll");
         } else {
             script.append("removeAll");
         }
