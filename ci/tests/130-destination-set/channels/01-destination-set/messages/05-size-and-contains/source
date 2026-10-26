@@ -1,0 +1,1 @@
+destinationSet.size() + ' ' + destinationSet.contains('Dest C')
