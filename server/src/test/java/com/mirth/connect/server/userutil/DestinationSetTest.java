@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 import com.mirth.connect.donkey.model.message.ConnectorMessage;
 import com.mirth.connect.donkey.server.Constants;
@@ -54,6 +57,23 @@ public class DestinationSetTest {
             return new ImmutableConnectorMessage(cm, true, destinationIdMap);
         } else {
             return new ImmutableConnectorMessage(cm, true);
+        }
+    }
+
+    /**
+     * Runs a JavaScript snippet with destinationSet in scope, as a channel script would. Rhino
+     * chooses which overload to call, so these tests check the overloads that scripts reach.
+     *
+     * @return the result of the script, converted to a boolean
+     */
+    private boolean evaluate(DestinationSet destinationSet, String script) {
+        Context context = Context.enter();
+        try {
+            Scriptable scope = context.initStandardObjects();
+            ScriptableObject.putProperty(scope, "destinationSet", Context.javaToJS(destinationSet, scope));
+            return Context.toBoolean(context.evaluateString(scope, script, "test", 1, null));
+        } finally {
+            Context.exit();
         }
     }
 
@@ -222,5 +242,110 @@ public class DestinationSetTest {
         DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), null));
 
         assertFalse(destinationSet.removeAllExcept("Seven"));
+    }
+
+    // --- Tests without a destination id map ---
+    @Test
+    public void test_removeObject_noDestinationIdMap_removeForMatchingMetadataId() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(null, metaDataIds));
+
+        assertTrue(destinationSet.remove(3));
+        assertFalse(metaDataIds.contains(3));
+        assertTrue(metaDataIds.size() == 4);
+    }
+
+    @Test
+    public void test_removeObject_noDestinationIdMap_noRemovalForConnectorName() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(null, metaDataIds));
+
+        assertFalse(destinationSet.remove("Three"));
+        assertTrue(metaDataIds.size() == 5);
+    }
+
+    @Test
+    public void test_removeAllExceptCollection_noDestinationIdMap_retainsMatchingMetadataIds() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(null, metaDataIds));
+
+        assertTrue(destinationSet.removeAllExcept(Arrays.asList(1, "Five")));
+        assertTrue(metaDataIds.size() == 1);
+        assertTrue(metaDataIds.contains(1));
+    }
+
+    // --- Tests for null collections ---
+    @Test(expected = NullPointerException.class)
+    public void test_removeCollection_nullCollection_throwsNullPointerException() throws Exception {
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), createMetadataIds()));
+        destinationSet.remove((Collection<Object>) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test_removeAllExceptCollection_nullCollection_throwsNullPointerException() throws Exception {
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), createMetadataIds()));
+        destinationSet.removeAllExcept((Collection<Object>) null);
+    }
+
+    // --- Tests for calls from JavaScript ---
+    @Test
+    public void test_javascript_removeMetadataId() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), metaDataIds));
+
+        assertTrue(evaluate(destinationSet, "destinationSet.remove(3)"));
+        assertTrue(metaDataIds.size() == 4);
+        assertFalse(metaDataIds.contains(3));
+    }
+
+    @Test
+    public void test_javascript_removeConnectorName() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), metaDataIds));
+
+        assertTrue(evaluate(destinationSet, "destinationSet.remove('Three')"));
+        assertTrue(metaDataIds.size() == 4);
+        assertFalse(metaDataIds.contains(3));
+    }
+
+    @Test
+    public void test_javascript_removeArray() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), metaDataIds));
+
+        assertTrue(evaluate(destinationSet, "destinationSet.remove([1, 'Three', 99])"));
+        assertTrue(metaDataIds.size() == 3);
+        assertFalse(metaDataIds.contains(1));
+        assertFalse(metaDataIds.contains(3));
+    }
+
+    @Test
+    public void test_javascript_removeAllExceptConnectorName() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), metaDataIds));
+
+        assertTrue(evaluate(destinationSet, "destinationSet.removeAllExcept('Seven')"));
+        assertTrue(metaDataIds.size() == 1);
+        assertTrue(metaDataIds.contains(7));
+    }
+
+    @Test
+    public void test_javascript_removeAllExceptArray() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), metaDataIds));
+
+        assertTrue(evaluate(destinationSet, "destinationSet.removeAllExcept([1, 'Five', 99])"));
+        assertTrue(metaDataIds.size() == 2);
+        assertTrue(metaDataIds.contains(1));
+        assertTrue(metaDataIds.contains(5));
+    }
+
+    @Test
+    public void test_javascript_removeAll() throws Exception {
+        Set<Integer> metaDataIds = createMetadataIds();
+        DestinationSet destinationSet = new DestinationSet(createMessage(createDestinationIdMap(), metaDataIds));
+
+        assertTrue(evaluate(destinationSet, "destinationSet.removeAll()"));
+        assertTrue(metaDataIds.isEmpty());
     }
 }
